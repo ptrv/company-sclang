@@ -30,16 +30,6 @@
   (require 'sclang))
 
 
-(defgroup company-sclang nil
-  "Completion back-end for SCLang."
-  :group 'company)
-
-(defcustom company-sclang-begin-after-member-access nil
-  "When non-nil, automatic completion will start whenever the current
-symbol is preceded by a \".\", ignoring `company-minimum-prefix-length'."
-  :group 'company-sclang
-  :type 'boolean)
-
 (defun company-sclang--make-candidate (candidate predicate)
   (let ((text (car candidate))
         (meta (if (eq predicate 'sclang-class-name-p)
@@ -65,13 +55,6 @@ symbol is preceded by a \".\", ignoring `company-minimum-prefix-length'."
           (get-text-property 0 'meta candidate)
           (substring-no-properties candidate)))
 
-(defun company-sclang--prefix ()
-  "Returns the symbol to complete. Also, if point is on a dot,
-triggers a completion immediately."
-  (if company-sclang-begin-after-member-access
-      (company-grab-symbol-cons "\\." 1)
-    (company-grab-symbol)))
-
 ;;;###autoload
 (defun company-sclang (command &optional arg &rest ignored)
   (interactive (list 'interactive))
@@ -79,7 +62,7 @@ triggers a completion immediately."
     (interactive (company-begin-backend 'company-sclang))
     (prefix (and (derived-mode-p 'sclang-mode)
                  (not (company-in-string-or-comment))
-                 (or (company-sclang--prefix) 'stop)))
+                 (or (company-grab-symbol) 'stop)))
     (candidates (company-sclang--candidates arg))
     (meta (company-sclang--meta arg))))
 
