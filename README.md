@@ -5,6 +5,8 @@ completion backend for `SCLang`.
 
 ## Installation ##
 
+### Manual ###
+
 Add `company-sclang` to the `load-path`:
 
 ```lisp
@@ -15,6 +17,7 @@ Add the following to your `init.el`:
 
 ```lisp
 (require 'company)
+(require 'company-sclang)
 (add-to-list 'company-backends 'company-sclang)
 ```
 
