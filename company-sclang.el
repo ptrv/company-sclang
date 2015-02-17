@@ -27,6 +27,7 @@
 (eval-when-compile
   (require 'cl-lib)
   (require 'company)
+  (require 'company-dabbrev-code)
   (require 'sclang))
 
 
@@ -65,6 +66,17 @@
                  (or (company-grab-symbol) 'stop)))
     (candidates (company-sclang--candidates arg))
     (meta (company-sclang--meta arg))))
+
+(defun company-sclang--init ()
+  (setq-local company-backends '((company-sclang
+                                  company-yasnippet
+                                  company-dabbrev-code)))
+  (make-local-variable 'company-dabbrev-code-modes)
+  (add-to-list 'company-dabbrev-code-modes 'sclang-mode))
+
+;;;###autoload
+(defun company-sclang-setup ()
+  (add-to-list 'sclang-mode-hook 'company-sclang--init))
 
 (provide 'company-sclang)
 ;;; company-sclang.el ends here
