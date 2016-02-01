@@ -33,8 +33,9 @@
 
 (defun company-sclang--make-candidate (candidate predicate)
   (let ((text (car candidate))
-        (meta (if (eq predicate 'sclang-class-name-p)
-                  "Class" "Method")))
+        (meta (pcase predicate
+                (`sclang-class-name-p "Class")
+                (`sclang-method-name-p "Method"))))
     (propertize text 'meta meta)))
 
 (defun company-sclang--candidates (prefix)
@@ -46,24 +47,26 @@
                     (lambda (assoc) (funcall predicate (car assoc)))
                     table))
          res)
-    (dolist (item keywords)
+    (dolist (item keywords res)
       (when (string-prefix-p prefix (car item))
-        (push (company-sclang--make-candidate item predicate) res)))
-    res))
+        (push (company-sclang--make-candidate item predicate) res)))))
 
 (defun company-sclang--meta (candidate)
   (format "%s: %s"
           (get-text-property 0 'meta candidate)
           (substring-no-properties candidate)))
 
+(defun company-sclang--prefix ()
+  (and (derived-mode-p 'sclang-mode)
+       (not (sclang-point-in-comment-p))
+       (or (sclang-symbol-at-point) 'stop)))
+
 ;;;###autoload
 (defun company-sclang (command &optional arg &rest ignored)
   (interactive (list 'interactive))
   (case command
     (interactive (company-begin-backend 'company-sclang))
-    (prefix (and (derived-mode-p 'sclang-mode)
-                 (not (company-in-string-or-comment))
-                 (or (company-grab-symbol) 'stop)))
+    (prefix (company-sclang--prefix))
     (candidates (company-sclang--candidates arg))
     (meta (company-sclang--meta arg))))
 
